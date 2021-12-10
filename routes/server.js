@@ -40,4 +40,13 @@ router.get("/", function (req, res) {
     });
 });
 
+router.get("/add", function (req, res) {
+    res.render("form");
+});
+
+router.post("/addPro", function(req, res) {
+    console.log(req.body);
+    res.send({"message": "ok"});
+});
+
 module.exports = router;
