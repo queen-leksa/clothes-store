@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <title>Clothes-store</title>
     <link rel="stylesheet" href="/style.css">
 </head>
@@ -12,6 +12,7 @@
         <div class="logo"><a href="/">Главная</a></div>
         <nav>
             <a href="">Категории</a>
+            <a href="/item">Товар</a>
             <a href="/add">Добавить товар</a>
             <a href="/goods">Все товары</a>
         </nav>
@@ -26,10 +27,17 @@
             </tr>
             <% for (let i = 0; i < goods.length; i++) { %>
                 <tr>
-                    <% for (let j = 0; j < goods[i].length; j++) { %>
-                        <td><%= goods[i][j] %></td>
+                    <% for (let name of names) { %>
+                        <th><%= name %></th>
                     <% } %>
                 </tr>
+                <% for (let i = 0; i < goods.length; i++) { %>
+                    <tr>
+                        <% for (let j = 0; j < goods[i].length; j++) { %>
+                            <td><%= goods[i][j] %></td>
+                        <% } %>
+                    </tr>
+                <% } %>
             <% } %>
         </table>
     </main>

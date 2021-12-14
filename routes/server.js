@@ -22,6 +22,10 @@ for (let i = 0; i < goods.length; i++) {
 }
 // console.log(goods);
 
+router.get("/item", (req, res) => {
+    res.render('item')
+})
+
 router.get("/", function (req, res) {
     // res.send("<h1>Магазин одежды</h1>");
 
