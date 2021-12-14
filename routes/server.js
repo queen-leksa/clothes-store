@@ -32,7 +32,7 @@ router.get("/", function (req, res) {
             console.log(data[0]);
             client.close();
         });
-    })
+    });
 
     res.render("index", {
         names: goodsNames,
@@ -46,7 +46,26 @@ router.get("/add", function (req, res) {
 
 router.post("/addPro", function(req, res) {
     console.log(req.body);
-    res.send({"message": "ok"});
+    const client = dbConnect();
+    client.connect(function(err) {
+        if (err) {
+            console.log("Ошибка!");
+            res.send({"message": "Ошибка соединения с БД"});
+            client.close();
+        }
+        console.log("Соединение с бд успешно");
+        const col = client.db("shop").collection("clothers");
+        col.insertOne(req.body, function (err) {
+            if (err) {
+                console.log("Данные не добавились");
+                res.send({"message": "БД не хочет с тобой работать"});
+                client.close();
+            } else {
+                res.send({"message": "ok"});
+                client.close();
+            }
+        });
+    });
 });
 
 module.exports = router;
