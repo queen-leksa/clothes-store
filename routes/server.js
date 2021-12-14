@@ -7,7 +7,14 @@ let goodsNames = ["Название", "Категория", "Артикул", "�
 let fileText = fs.readFileSync("./data/goods.csv", "utf-8");
 // console.log(fileText);
 // let goods = fileText.split("\n"); - для UNIX!
-let goods = fileText.split("\r\n"); // - для Window
+const OS = "mac"; // "win"
+let splitter;
+if (OS === "mac") {
+    splitter = "\n";
+} else {
+    splitter = "\r\n";
+}
+let goods = fileText.split(splitter); // - для Window
 
 for (let i = 0; i < goods.length; i++) {
     //'Футболка;Одежда;00123;cyan;M;10;1000;ВсеМайки.ru', => ['Футболка','Одежда','00123','cyan','M','10','1000','ВсеМайки.ru']
@@ -33,7 +40,8 @@ router.get("/", function (req, res) {
             client.close();
         });
     });
-
+    console.log(goods.length);
+    console.log(goods);
     res.render("index", {
         names: goodsNames,
         goods: goods
@@ -41,7 +49,11 @@ router.get("/", function (req, res) {
 });
 
 router.get("/add", function (req, res) {
-    res.render("form");
+    res.render("form", {
+        names: goodsNames,
+        formNames: ["name", "category", "article", "color", "size", "count", "price", "brand"],
+        types: ["text", "text", "number", "color", "text", "number", "number", "text"]
+    });
 });
 
 router.post("/addPro", function(req, res) {
@@ -55,17 +67,45 @@ router.post("/addPro", function(req, res) {
         }
         console.log("Соединение с бд успешно");
         const col = client.db("shop").collection("clothers");
-        col.insertOne(req.body, function (err) {
-            if (err) {
-                console.log("Данные не добавились");
-                res.send({"message": "БД не хочет с тобой работать"});
-                client.close();
+        col.findOne({"article": req.body.article}, function(err, data) {
+            if (data) {
+                res.send({"message": "Товар с таким артикулом уже существует"})
             } else {
-                res.send({"message": "ok"});
-                client.close();
+                col.insertOne(req.body, function (err) {
+                    if (err) {
+                        console.log("Данные не добавились");
+                        res.send({"message": "БД не хочет с тобой работать"});
+                        client.close();
+                    } else {
+                        res.send({"message": "ok"});
+                        client.close();
+                    }
+                });
             }
+            console.log(data);
         });
     });
 });
 
+router.get("/goods", function (req, res) {
+    const client = dbConnect();
+    client.connect(function(err) {
+        if (err) {
+            console.log("Ошибка!");
+        }
+        console.log("Соединение с бд успешно");
+        const col = client.db("shop").collection("clothers");
+        col.find({}).toArray(function(err, data) {
+            if (err) {
+                console.log("Ошибка получения данных");
+            }
+            res.render("goods", {
+                names: goodsNames,
+                formNames: ["name", "category", "article", "color", "size", "count", "price", "brand"],
+                goods: data
+            });
+            client.close();
+        });
+    });
+});
 module.exports = router;

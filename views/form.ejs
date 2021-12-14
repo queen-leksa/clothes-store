@@ -4,15 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Clothes-store</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/functions.js"></script>
 </head>
 <body>
-    <h1>Добавить товар</h1>
+<header>
+    <div class="logo"><a href="/">Главная</a></div>
+    <nav>
+        <a href="">Категории</a>
+        <a href="/add">Добавить товар</a>
+        <a href="/goods">Все товары</a>
+    </nav>
+</header>
+<main>
+    <h1 class="form_caption">Добавить товар</h1>
     <form>
-        <input name="name" type="text" placeholder="Название одежды">
+        <% for (let i = 0; i < formNames.length; i++) { %>
+            <div class="form_row">
+                <label for=<%=formNames[i]%>><%= names[i] %></label>
+                <% if (formNames[i] === "category") { %>
+                    <select name=<%=formNames[i]%> id=<%=formNames[i]%>>
+                        <option selected>Одежда</option>
+                        <option>Обувь</option>
+                        <option>Аксессуары</option>
+                    </select>
+                <% } else { %>
+                    <input name=<%=formNames[i]%> id=<%=formNames[i]%> type=<%=types[i]%>>
+                <% } %>
+            </div>
+        <% } %>
         <button type="submit">Добавить</button>
     </form>
     <script src="/addProduct.js"></script>
+</main>
 </body>
 </html>

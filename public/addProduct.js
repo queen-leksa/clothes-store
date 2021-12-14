@@ -11,7 +11,13 @@ async function send(data) {
     });
     let info = await res.json();
     console.log(info);
-};
+    if (info.message !== "ok") {
+        showPopup(info.message)
+    } else {
+        form.reset();
+    }
+
+}
 
 form.addEventListener("submit", function(e) {
     e.preventDefault(); // остановить событие по умолчанию
