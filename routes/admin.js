@@ -3,14 +3,14 @@ const dbConnect = require("./connect");
 const mongo = require("mongodb");
 
 // cb - функция, которая будет работать внутри функции dbQuery (callback)
-const dbQuery = function(cb, queryParam = {}, dataObj = null) {
+const dbQuery = function(cb, res, queryParam = {}, dataObj = null) {
     const client = dbConnect();
     client.connect(function(err) {
         if (err) {
             res.send({"message": "Ошибка соединения с базой данных"})
             client.close();
         }
-        const col = client.db("shop").clooection("clothers");
+        const col = client.db("shop").collection("clothers");
         cb(col, client, res, queryParam, dataObj);
     });
 };
@@ -62,19 +62,20 @@ const queryUpdate = function(col, cl, rs, param, newData) {
 
 /* Получить все товары из БД */
 router.get("/db", function(req, res) {
-    dbQuery(queryFind);
+    // res.send({msg: "omg"})
+    dbQuery(queryFind, res);
 });
 /* Удалить товар из БД по артикулу */
 router.delete("/db/:article", function(req, res) {
-    dbQuery(queryDelete, {"article": req.params.article});
+    dbQuery(queryDelete, res, {"article": req.params.article});
 });
 /* Изменить информацию о товаре в БД по артикулу */
 router.put("/db/:article", function(req, res) {
-    dbQuery(queryUpdate, {"article": req.params.article}, req.body);
+    dbQuery(queryUpdate, res, {"article": req.params.article}, req.body);
 });
 
 router.get("/", function(req, res) {
-    res.render("all");
+    res.render("admin");
 });
 
 module.exports = router;

@@ -29,5 +29,9 @@ form.addEventListener("submit", function(e) {
         }
     }
     console.log(body);
-    send(body);
+    if (body.article) {
+        send(body);
+    } else {
+        showPopup("Артикул не заполнен!");
+    }
 });
