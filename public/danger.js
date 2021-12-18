@@ -1,14 +1,14 @@
 // document.body.style.background = "darkslateblue";
 
 let div = document.querySelector(".admin");
-
-const getData = async function (tag) {
-
+var goods;
+const getData = async function (tag, local) {
     let res = await fetch("/admin/db");
     let result = await res.json();
     // Далее распределить данные в виде html-тегов
     localStorage.setItem("goods", JSON.stringify(result.data));
     if (result.data) {
+        window.goods = [...result.data];
         parseGoods(result.data, div);
     }
 }
@@ -25,7 +25,7 @@ const updateData = async function(param, data) {
     console.log(result);
 }
 
-const deleteData = async function(param) {
+const deleteData = async function(param, row) {
     let res = await fetch(`/admin/db/${param}`, {
         method: "delete",
         headers: {
@@ -34,7 +34,14 @@ const deleteData = async function(param) {
         }
     });
     let result = await res.json();
-    showPopup(JSON.stringify(result));
+    if (result.message === "ok") {
+        showPopup(JSON.stringify(result));
+        window.goods = window.goods.filter(item => item.article !== param);
+        localStorage.setItem("goods", JSON.stringify(window.goods));
+        row.remove();
+    } else {
+        showPopup(result.message);
+    }
 }
 
 const parseGoods = function (goods, el) {
@@ -63,19 +70,48 @@ const parseGoods = function (goods, el) {
 const deleteItem = function (btn) {
     console.log(btn);
     let article = btn.getAttribute("data-art");
-    deleteData(article);
+    deleteData(article, btn.parentElement.parentElement);
 }
 
-const updateItem = function(i) {
-    console.log(goods[i]);
+const updateItem = function(btn) {
+    let index = btn.getAttribute("data-id");
+    let row = btn.parentElement.parentElement;
+    let rowNames = row.parentElement.firstElementChild;
+    for (let i = 0; i < row.childNodes.length - 1; i++) {
+        let td = row.childNodes[i];
+        let val = td.innerText;
+        let name = rowNames.childNodes[i].innerText;
+        console.log(td, rowNames.childNodes[i]);
+        td.innerHTML = `<input type="text" name="${name}" value="${val}">`;
+    }
+    let last = row.lastElementChild;
+    last.innerHTML = `<button>Ок</button>
+                      <button>Отмена</button>`
+    let cancel = last.lastElementChild;
+    cancel.onclick = function() {
+        for (let i = 0; i < row.childNodes.length - 1; i++) {
+            let td = row.childNodes[i];
+            console.log(td, rowNames.childNodes[i]);
+            td.innerHTML = td.firstElementChild.value;
+        }
+        last.innerHTML = `<button data-id="${index}" onclick="updateItem(this)">Изменить</button>
+        <button data-art="${window.goods[index].article}" onclick="deleteItem(this)">Удалить</button>`
+    }
+    let change = last.firstElementChild;
+    change.onclick = function() {
+        console.log("aaa");
+    }
+
+    console.log(btn, window.goods[index]);
 }
 
 
-let goods = localStorage.getItem("goods");
+goods = localStorage.getItem("goods");
 console.log(goods);
 if (goods) {
     goods = JSON.parse(goods);
+
     parseGoods(goods, div);
 } else {
-    getData(div);
+    getData(div, goods);
 }
