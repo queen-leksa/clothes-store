@@ -49,6 +49,7 @@ const queryAdd = function(col, cl, rs, param = null, obj) {
     });
 }
 const queryUpdate = function(col, cl, rs, param, newData) {
+    console.log(newData, param);
     col.updateOne(param, {$set: newData}, function(err, result) {
         if (err) {
             rs.send({"message": "База данных не отвечает"});
@@ -71,7 +72,7 @@ router.delete("/db/:article", function(req, res) {
 });
 /* Изменить информацию о товаре в БД по артикулу */
 router.put("/db/:article", function(req, res) {
-    dbQuery(queryUpdate, res, {"article": req.params.article}, req.body);
+    dbQuery(queryUpdate, res, {"_id": mongo.ObjectId(req.params.article)}, req.body);
 });
 
 router.get("/", function(req, res) {
